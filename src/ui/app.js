@@ -63,6 +63,8 @@ async function initSession(sessionId) {
     state.sessionId = sessionId;
     switchView('editor');
     await refreshImage();
+    // Auto-detect text on load/upload
+    await detect('text');
 }
 
 async function loadStock(color) {
@@ -315,6 +317,38 @@ dom.canvas.addEventListener('mousedown', async (e) => {
         if (pos.x >= l.x && pos.x <= l.x + lw && pos.y >= l.y && pos.y <= l.y + lh) {
             hitLayerId = l.id;
             break;
+        }
+    }
+
+    // 3.5 Detected Items Hit Test (Auto-Lift)
+    if (!hitLayerId && (!state.activeTool || state.activeTool === 'move' || state.activeTool === 'lift')) {
+        let hitItem = null;
+        for (let item of state.detectedItems) {
+            const b = item.box;
+            if (pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h) {
+                hitItem = item;
+                break;
+            }
+        }
+
+        if (hitItem) {
+            try {
+                setStatus("Selecting text...");
+                const cx = hitItem.box.x + hitItem.box.w / 2;
+                const cy = hitItem.box.y + hitItem.box.h / 2;
+                const res = await api(`/session/${state.sessionId}/layers/lift`, 'POST', { x: Math.floor(cx), y: Math.floor(cy) });
+                await refreshImage();
+                setStatus(`Selected ${res.type}`);
+                selectLayer(res.layer_id);
+
+                // Remove this item from detections as it is now a layer
+                state.detectedItems = state.detectedItems.filter(i => i !== hitItem);
+                draw();
+            } catch (e) {
+                alert(e.message);
+                setStatus("Selection failed");
+            }
+            return;
         }
     }
 

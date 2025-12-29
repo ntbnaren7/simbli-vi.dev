@@ -52,3 +52,11 @@ test_output*.txt
 # OS Generated
 .DS_Store
 Thumbs.db
+
+# Local Utility Scripts
+verify_*.py
+main.py
+
+# Test Assets
+test_*.png
+test_*.jpg

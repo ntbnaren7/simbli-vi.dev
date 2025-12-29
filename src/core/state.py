@@ -74,6 +74,7 @@ class ImageState:
         self._history: List[ImageVersion] = [genesis_version]
         self._current_index: int = 0
         self._source_metadata = source_metadata or {}
+        self.cache: dict = {}
 
     @property
     def current_version(self) -> ImageVersion:
@@ -143,6 +144,10 @@ class ImageState:
             # Default pickle/deepcopy of PIL Image actually saves the bytes, efficient?
             # Actually, `copy.deepcopy` works fine for Python objects.
             saved_layers.append(copy.deepcopy(l))
+            
+        # Clear cache on modification
+        if hasattr(self, 'cache'):
+            self.cache.clear()
             
         new_version = ImageVersion(
             id=str(uuid.uuid4()),

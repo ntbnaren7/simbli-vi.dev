@@ -79,6 +79,13 @@ def load_stock_image(color_or_path: str):
         img = source.load()
         state = ImageState(img, source.get_metadata())
         
+        # Auto-detect text
+        detector = Detector()
+        try:
+            state.cache['text_detections'] = detector.detect_text(state.current_version.as_pil)
+        except Exception as e:
+            print(f"Auto-detection failed: {e}")
+        
         session_id = str(uuid.uuid4())
         sessions[session_id] = state
         
@@ -94,6 +101,13 @@ async def upload_image(file: UploadFile):
         source = UploadImageSource(contents, file.filename or "uploaded.png")
         img = source.load()
         state = ImageState(img, source.get_metadata())
+        
+        # Auto-detect text
+        detector = Detector()
+        try:
+            state.cache['text_detections'] = detector.detect_text(state.current_version.as_pil)
+        except Exception as e:
+            print(f"Auto-detection failed: {e}")
         
         session_id = str(uuid.uuid4())
         sessions[session_id] = state
@@ -239,7 +253,12 @@ def detect_text(session_id: str):
     state = get_session(session_id)
     detector = Detector()
     try:
-        items = detector.detect_text(state.current_version.as_pil)
+        if 'text_detections' in state.cache:
+            items = state.cache['text_detections']
+        else:
+            items = detector.detect_text(state.current_version.as_pil)
+            state.cache['text_detections'] = items
+            
         return {"items": items}
     except Exception as e:
         print(f"Detection failed: {e}")
@@ -280,7 +299,13 @@ def lift_content(session_id: str, request: PointRequest):
     # 1. Check Text first (Text often overlaps objects but is more specific)
     # We need to run detection on the current composite image
     # Note: detect_text is somewhat expensive, but necessary
-    text_items = detector.detect_text(img)
+    if 'text_detections' in state.cache:
+        text_items = state.cache['text_detections']
+    else:
+        text_items = detector.detect_text(img)
+        # We don't necessarily cache here as img might have changed? 
+        # Actually lift is on current_version. 
+        state.cache['text_detections'] = text_items
     target_text = None
     # Find smallest containing box
     for item in text_items:
