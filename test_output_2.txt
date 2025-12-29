@@ -1,0 +1,10 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: D:\AntiGravity Projects\simbli-image-v1
+configfile: pyproject.toml
+plugins: anyio-4.12.0
+collected 1 item
+
+tests\test_magic_remove.py .                                             [100%]
+
+============================== 1 passed in 2.17s ==============================

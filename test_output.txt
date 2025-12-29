@@ -1,0 +1,22 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: D:\AntiGravity Projects\simbli-image-v1
+configfile: pyproject.toml
+plugins: anyio-4.12.0
+collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+_________________ ERROR collecting tests/test_magic_remove.py _________________
+ImportError while importing test module 'D:\AntiGravity Projects\simbli-image-v1\tests\test_magic_remove.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ntbft\AppData\Local\Programs\Python\Python311\Lib\importlib\__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_magic_remove.py:5: in <module>
+    from src.api.main import app
+E   ModuleNotFoundError: No module named 'src'
+=========================== short test summary info ===========================
+ERROR tests/test_magic_remove.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.40s ===============================
