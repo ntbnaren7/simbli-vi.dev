@@ -9,88 +9,59 @@
 </head>
 
 <body>
-    <div id="app">
-        <!-- HEADER -->
-        <header>
-            <div class="logo">Simbli V1</div>
-            <div class="status" id="status">Ready</div>
-        </header>
+    <div id="status">Ready</div>
 
-        <!-- VIEW: UPLOAD -->
-        <div id="upload-view" class="view active">
-            <div class="upload-container">
-                <h1>Edit Image</h1>
-                <p>Upload an image to begin proof of contract.</p>
-                <label for="file-upload" class="btn primary">Select Image</label>
-                <input type="file" id="file-upload" accept="image/*" hidden>
-                <div class="divider">OR</div>
-                <button class="btn secondary" onclick="loadStock('gray')">Use Stock (Gray)</button>
-            </div>
+    <!-- View 1: Upload/Start -->
+    <div id="upload-view" class="view active">
+        <h1>Simbli V1</h1>
+        <div class="card">
+            <h3>Start Project</h3>
+            <input type="file" id="file-upload" accept="image/*">
+            <p style="margin: 10px 0; color: #666;">or</p>
+            <button class="text-btn" onclick="loadStock('gray')">Use Demo Image</button>
+        </div>
+    </div>
+
+    <!-- View 2: Editor -->
+    <div id="editor-view" class="view">
+        <div id="toolbar">
+            <button class="btn tool active" id="tool-select" onclick="window.setTool('select')"
+                title="Select">SEL</button>
+            <button class="btn tool" id="tool-text" onclick="window.setTool('text')" title="Text">TXT</button>
+            <button class="btn tool" id="tool-lift" onclick="window.setTool('lift')" title="Lift">LFT</button>
+            <button class="btn tool" id="tool-magic-remove" onclick="window.setTool('magic-remove')"
+                title="Remove">RMV</button>
+            <div class="sep"></div>
+            <button class="btn" onclick="actions.undo()" title="Undo">↶</button>
+            <button class="btn" onclick="actions.redo()" title="Redo">↷</button>
+            <div class="sep"></div>
+            <button class="btn" onclick="location.reload()" title="Exit">✖</button>
         </div>
 
-        <!-- VIEW: EDITOR -->
-        <div id="editor-view" class="view">
-            <div class="toolbar">
-                <div class="group">
-                    <button class="btn icon" onclick="actions.undo()" title="Undo">↩</button>
-                    <button class="btn icon" onclick="actions.redo()" title="Redo">↪</button>
-                </div>
-                <div class="group">
-                    <span class="label">Operation:</span>
-                    <button class="btn tool" onclick="setTool('fill')" id="tool-fill">Fill Red</button>
-                    <button class="btn tool" onclick="setTool('harmonize')" id="tool-harmonize">Brighten</button>
-                    <button class="btn tool" onclick="setTool('move')" id="tool-move">Move</button>
-                </div>
-                <div class="divider-v"></div>
-                <div class="group">
-                    <span class="label">Magic:</span>
-                    <button class="btn tool" onclick="setTool('lift')" id="tool-lift">Lift</button>
-                    <button class="btn tool" onclick="setTool('magic-remove')" id="tool-magic-remove">Remove</button>
-                    <button class="btn secondary" onclick="detect('objects')">Find Obj</button>
-                </div>
-            </div>
+        <div id="canvas-container">
+            <canvas id="editor-canvas"></canvas>
+        </div>
 
-            <div class="workspace" style="display: flex; gap: 20px; padding: 20px; align-items: flex-start;">
-                <div class="canvas-area">
-                    <canvas id="editor-canvas"></canvas>
-                    <div id="instruction-overlay">Drag to Select Area</div>
-                </div>
-                <div class="sidebar"
-                    style="min-width: 200px; background: #222; padding: 10px; border-radius: 8px; border: 1px solid #444;">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h3 style="margin: 0;">Layers</h3>
-                        <button class="btn" style="padding: 2px 8px; font-size: 1.2em;"
-                            onclick="document.getElementById('add-layer-input').click()" title="Add Object">+</button>
-                        <input type="file" id="add-layer-input" accept="image/*" hidden
-                            onchange="window.addLayer(this.files[0])">
-                    </div>
-                    <div id="layers-list" style="display: flex; flex-direction: column; gap: 5px; min-height: 100px;">
-                    </div>
+        <div id="sidebar">
+            <h3>Layers</h3>
+            <div id="layers-list"></div>
 
-                    <div id="text-controls"
-                        style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px; display: none;">
-                        <label style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #aaa;">Text
-                            Style:</label>
-                        <div style="display: flex; gap: 5px; align-items: center;">
-                            <input type="color" id="font-color" title="Font Color" onchange="window.updateTextStyle()">
-                            <input type="number" id="font-size" value="24" min="8" max="200"
-                                style="width: 60px; padding: 4px;" onchange="window.updateTextStyle()">
-                            <span style="font-size: 0.8em;">px</span>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
-                        <button class="btn" style="width: 100%; font-size: 0.9em;"
-                            onclick="document.getElementById('replace-layer-input').click()">Replace Selected</button>
-                        <input type="file" id="replace-layer-input" accept="image/*" hidden
-                            onchange="window.replaceLayer(this.files[0])">
-                    </div>
+            <div id="text-controls"
+                style="display:none; margin-top: 20px; border-top: 1px solid #444; padding-top:10px;">
+                <h4>Text Options</h4>
+                <div style="margin-bottom:8px">
+                    <label>Size</label>
+                    <input type="number" id="font-size" value="40" onchange="updateTextStyle()">
                 </div>
+                <div style="margin-bottom:8px">
+                    <label>Color</label>
+                    <input type="color" id="font-color" value="#ffffff" onchange="updateTextStyle()">
+                </div>
+                <button onclick="editSelectedText()">Edit Content</button>
             </div>
         </div>
     </div>
-    </div>
+
     <script src="app.js"></script>
 </body>
 
